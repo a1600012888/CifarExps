@@ -17,7 +17,8 @@ import torch.nn as nn
 import os
 from train import adversairal_train_one_epoch, adversarial_val
 from collections import OrderedDict
-from test import evalRoboustness
+#from test import evalRoboustness
+from test import evalRoboustness2 as evalRoboustness
 parser = argparse.ArgumentParser()
 parser.add_argument('--weight_decay', default=5e-4, type = float, help='weight decay (default: 5e-4)')
 parser.add_argument('--epochs', default=180, type=int, metavar='N',
@@ -52,8 +53,8 @@ writer = SummaryWriter(log_dir)
 clock = TrainClock()
 
 learning_rate_policy = [[80, 0.1],
-                        [50, 0.01],
-                        [50, 0.001]
+                        [40, 0.01],
+                        [30, 0.001]
                         ]
 get_learing_rate = MultiStageLearningRatePolicy(learning_rate_policy)
 
@@ -65,9 +66,9 @@ def adjust_learning_rate(optimzier, epoch):
         param_group['lr'] = lr
 
 torch.backends.cudnn.benchmark = True
-ds_train = create_train_dataset()
+ds_train = create_train_dataset(args.batch_size)
 
-ds_val = create_test_dataset()
+ds_val = create_test_dataset(args.batch_size)
 
 net = cifar_resnet18(expansion = args.wide)
 net.cuda()
